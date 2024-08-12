@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Google Trends Filter</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    body {
+      width: 300px;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    .input-container {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    #filterInput {
+      flex-grow: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px 0 0 4px;
+    }
+    #filterButton, #addFavoriteButton, #clearButton, .exportButton {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 6px 8px;
+      cursor: pointer;
+    }
+    #filterButton {
+      border-radius: 0;
+    }
+    #addFavoriteButton {
+      border-radius: 0 4px 4px 0;
+    }
+    #clearButton {
+      background-color: #34a853;
+      margin-left: 5px;
+      border-radius: 4px;
+    }
+    .exportButton {
+      margin-left: 5px;
+      border-radius: 4px;
+    }
+    .material-icons {
+      font-size: 16px;
+    }
+    #results {
+      background-color: white;
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+    }
+    .favorite, #searchHistory li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px;
+      background-color: #e0e0e0;
+      margin-bottom: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .favorite button, #searchHistory li button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 2px 4px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .favorite button .material-icons, #searchHistory li button .material-icons {
+      font-size: 14px;
+    }
+    #searchHistory ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .exploration-depth {
+      margin-bottom: 15px;
+    }
+    .exploration-depth label {
+      display: inline-block;
+      margin-right: 10px;
+    }
+    .export-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .exportButton {
+      flex: 1;
+      margin: 0 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="input-container">
+    <input type="text" id="filterInput" placeholder="Entrez un mot-clé">
+    <button id="filterButton"><i class="material-icons">search</i></button>
+    <button id="addFavoriteButton"><i class="material-icons">star</i></button>
+    <button id="clearButton"><i class="material-icons">refresh</i></button>
+  </div>
+  <div class="exploration-depth">
+    <label>Profondeur d'exploration:</label>
+    <select id="explorationDepth">
+      <option value="30">30 résultats</option>
+      <option value="50">50 résultats</option>
+      <option value="100">100 résultats</option>
+    </select>
+  </div>
+  <div id="results"></div>
+  <div class="export-buttons">
+    <button id="exportDataButton" class="exportButton"><i class="material-icons">file_download</i> Requêtes</button>
+    <button id="exportNgramsButton" class="exportButton"><i class="material-icons">file_download</i> N-grams</button>
+  </div>
+  <h3>Favoris</h3>
+  <div id="favorites"></div>
+  <h3>Historique des recherches</h3>
+  <div id="searchHistory"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
