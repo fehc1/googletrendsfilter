@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Trends Filter</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            width: 300px;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            position: relative;
+            min-height: 400px;
+        }
+        .filter-container {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .filter-option {
+            margin-bottom: 10px;
+        }
+        .filter-option input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        .search-container input {
+            flex-grow: 1;
+            border: none;
+            padding: 5px;
+            outline: none;
+        }
+        .search-container .material-icons {
+            color: #777;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .search-and-clear {
+            display: flex;
+            align-items: center;
+        }
+        .clear-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            height: 36px;
+            width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toggle-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        .toggle-button {
+            text-align: center;
+            padding: 8px 20px;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+        .toggle-button.active {
+            background-color: #c0c0c0;
+        }
+        .separator {
+            border-left: 1px solid #999;
+            height: 20px;
+            margin: auto 0;
+        }
+        .history-favorites {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background-color: #ffffff;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            max-height: 50px;
+            overflow: hidden;
+        }
+        .item.removing {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .item .material-icons {
+            color: #f44336;
+            cursor: pointer;
+        }
+        .result-container {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            margin-bottom: 40px;
+        }
+        .result-container.show {
+            opacity: 1;
+        }
+        .download-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .download-button {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .settings-container {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            z-index: 1000;
+        }
+        .settings-icon {
+            cursor: pointer;
+            color: #555;
+        }
+        .settings-dropdown {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .settings-item select {
+            margin-left: 10px;
+        }
+        .extension-title {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            color: #000;
+            z-index: 999;
+            background-color: #f5f5f5;
+            padding: 5px 0;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        #newsSection {
+            display: none;
+            margin-top: 15px;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .news-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        .news-item h5 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        .news-item p {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .news-item a {
+            color: #4285f4;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .news-item a:hover {
+            text-decoration: underline;
+        }
+        .news-date {
+            font-size: 0.8em;
+            color: #666;
+            margin: 5px 0;
+        }
+        .modal {
+          display: none;
+          position: fixed;
+          z-index: 1000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+          background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+          background-color: #fefefe;
+          margin: 15% auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%;
+          border-radius: 5px;
+        }
+        #closeModal {
+          background-color: #4CAF50;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          float: right;
+        }
+        #closeModal:hover {
+          background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="filter-container">
+        <div class="filter-option">
+            <div class="search-and-clear">
+                <div class="search-container">
+                    <input type="text" id="filterInput" placeholder="Entrez un mot clé">
+                    <i class="material-icons" id="searchIcon">search</i>
+                    <i class="material-icons" id="favoriteIcon">star_border</i>
+                </div>
+                <button class="clear-button" id="clearButton"><i class="material-icons">refresh</i></button>
+            </div>
+        </div>
+    </div>
+    <div class="toggle-buttons">
+        <div class="toggle-button active" id="allButton">Tous</div>
+        <div class="toggle-button" id="favoritesButton">Favoris</div>
+        <div class="separator"></div>
+        <div class="toggle-button" id="newsButton">Actualités</div>
+    </div>
+    <div class="history-favorites" id="historyFavorites"></div>
+    <div class="result-container" id="resultContainer">
+        <div id="resultText"></div>
+        <div class="download-buttons">
+            <button class="download-button" id="exportDataButton">Requêtes</button>
+            <button class="download-button" id="exportNgramsButton">N-Grams</button>
+        </div>
+    </div>
+    <div id="newsSection">
+        <h3>Actualités</h3>
+        <div id="newsSummary"></div>
+    </div>
+    <div class="settings-container">
+        <i class="material-icons settings-icon" id="settingsIcon">settings</i>
+        <div class="settings-dropdown" id="settingsDropdown">
+            <div class="settings-item">
+                <span id="languageLabel">Langue</span>
+                <select id="languageSelect">
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="extension-title">Google Trends Filter</div>
+    <div id="warningModal" class="modal">
+        <div class="modal-content">
+          <h2>Warning</h2>
+          <p>This extension only works on the Google Trends page.</p>
+          <p>Please go to <a href="https://trends.google.com/trending" target="_blank">https://trends.google.com/trending</a> to use the extension.</p>
+          <button id="closeModal">Close</button>
+        </div>
+      </div>
+    <script src="popup.js"></script>
+</body>
+</html>
