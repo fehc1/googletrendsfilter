@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Trends Pocket",
   "version": "2.5.0",
-  "description": "Monitor and analyze Google Trends data directly from your browser, with real-time insights and search visualization",
+  "description": "Explore trending topics and analyze Google Trends data in real-time. Track, visualize, and understand search patterns instantly.",
   "permissions": [
     "activeTab",
     "storage",
