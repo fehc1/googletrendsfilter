@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trends Pocket</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            width: 100%;
+            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #FFFFFF;
+            color: #3F334D;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background-color: #FFFFFF;
+            color: #3F334D;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .settings-icon {
+            cursor: pointer;
+            color: #5f6368;
+            transition: color 0.2s ease;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .settings-icon:hover {
+            color: #4285f4;
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+
+        .settings-dropdown {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            background-color: #FFFFFF;
+            border: 1px solid rgba(63, 51, 77, 0.12);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            width: 280px;
+            z-index: 1000;
+        }
+
+        .content {
+            padding: 0;
+            height: calc(100vh - 73px);
+            overflow-y: auto;
+        }
+
+        .main-menu {
+            display: flex;
+            background-color: #f8f9fa;
+            margin: 0;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .main-menu-item {
+            flex: 1;
+            padding: 16px 12px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .main-menu-item.active {
+            background-color: white;
+            color: #4285f4;
+            border-bottom-color: #4285f4;
+        }
+
+        .main-menu-item:hover:not(.active) {
+            background-color: #f1f3f4;
+        }
+
+        .content-section {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .trends-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(63, 51, 77, 0.05);
+            margin-top: 15px;
+        }
+
+        .trends-table th {
+            background-color: #F8F9FA;
+            padding: 12px;
+            text-align: left;
+            cursor: pointer;
+            position: relative;
+            font-weight: 600;
+            color: #3F334D;
+            font-size: 13px;
+        }
+
+        .trends-table th:hover {
+            background-color: rgba(69, 140, 195, 0.1);
+        }
+
+        .trends-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(63, 51, 77, 0.08);
+            font-size: 13px;
+        }
+
+        .trends-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .trend-title {
+            font-weight: 500;
+        }
+
+        .trend-title a {
+            color: inherit;
+            text-decoration: none;
+            display: block;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .trend-title a:hover {
+            background-color: rgba(69, 140, 195, 0.1);
+        }
+
+        .trend-volume {
+            color: #458cc3;
+            font-weight: 500;
+        }
+
+        .trend-start {
+            font-size: 12px;
+            color: #5f6368;
+        }
+
+        .search-trend {
+            cursor: pointer;
+            color: #458cc3;
+            padding: 4px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .search-trend:hover {
+            background-color: rgba(69, 140, 195, 0.1);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(63, 51, 77, 0.12);
+            font-family: inherit;
+            background-color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 8px 0;
+        }
+
+        select:focus {
+            border-color: #458cc3;
+            box-shadow: 0 0 0 3px rgba(69, 140, 195, 0.1);
+            outline: none;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #3F334D;
+            margin: 20px 0 15px 0;
+            padding-left: 10px;
+            border-left: 3px solid #458cc3;
+        }
+
+        /* Comparaison de tendances */
+        .comparison-container {
+            margin: 20px 0;
+        }
+
+        .keywords-list {
+            margin: 15px 0;
+        }
+
+        .keyword-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .keyword-item.color-1 { border-left-color: #4285f4; }
+        .keyword-item.color-2 { border-left-color: #ea4335; }
+        .keyword-item.color-3 { border-left-color: #fbbc04; }
+        .keyword-item.color-4 { border-left-color: #34a853; }
+        .keyword-item.color-5 { border-left-color: #9c27b0; }
+
+        .keyword-item input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            padding: 4px 8px;
+            outline: none;
+        }
+
+        .keyword-item .remove-keyword {
+            color: #5f6368;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .keyword-item .remove-keyword:hover {
+            background: rgba(234, 67, 53, 0.1);
+            color: #ea4335;
+        }
+
+        .add-keyword-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #dadce0;
+            border-radius: 8px;
+            background: transparent;
+            color: #5f6368;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .add-keyword-btn:hover {
+            border-color: #4285f4;
+            color: #4285f4;
+            background: rgba(66, 133, 244, 0.05);
+        }
+
+        .compare-controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .compare-controls select {
+            flex: 1;
+            margin: 0;
+        }
+
+        .trends-iframe {
+            width: 100%;
+            border: none;
+            margin: 15px 0;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(63, 51, 77, 0.05);
+            height: 450px;
+            min-height: 350px;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .iframe-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #3F334D;
+            margin: 15px 0 8px 0;
+            padding-left: 10px;
+            border-left: 3px solid #458cc3;
+        }
+
+        .settings-item {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(63, 51, 77, 0.08);
+        }
+
+        .settings-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .settings-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .custom-checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .custom-checkbox input {
+            display: none;
+        }
+
+        .checkbox-icon {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #458cc3;
+            border-radius: 6px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .custom-checkbox input:checked + .checkbox-icon {
+            background-color: #458cc3;
+        }
+
+        .checkbox-icon:after {
+            content: '\2713';
+            color: white;
+            display: none;
+        }
+
+        .custom-checkbox input:checked + .checkbox-icon:after {
+            display: block;
+        }
+
+        .sub-options {
+            margin-left: 26px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .sub-options.visible {
+            display: block;
+        }
+
+        .sub-option {
+            margin-bottom: 8px;
+        }
+
+        .sub-option label {
+            display: block;
+            margin-bottom: 4px;
+            color: #3F334D;
+            font-size: 12px;
+        }
+
+        .sub-option select {
+            margin: 0;
+            font-size: 13px;
+            padding: 8px;
+        }
+
+        .full-info-link {
+            display: inline-block;
+            margin: 15px 0;
+            padding: 8px 16px;
+            background: #4285f4;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 12px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .full-info-link:hover {
+            background: #3367d6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #5f6368;
+        }
+
+        .empty-state .material-icons {
+            font-size: 48px;
+            color: #dadce0;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #3c4043;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f3f4;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #dadce0;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .trend-modal {
+            display: none;
+            position: fixed;
+            background-color: white;
+            width: 280px;
+            min-height: 80px;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+        }
+
+        .trend-modal.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .trend-modal-content {
+            padding: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .trend-modal-header h4 {
+            margin: 0 0 8px 0;
+            color: #3F334D;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .trend-modal-body {
+            font-size: 12px;
+            line-height: 1.4;
+            color: #5f6368;
+        }
+
+        .trend-modal-loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+        }
+
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 2px solid #4285f4;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive design for better iframe display */
+        @media (min-width: 400px) {
+            .trends-iframe {
+                height: 500px;
+            }
+            #compareGeoFrame {
+                height: 600px !important;
+            }
+        }
+
+        @media (min-width: 600px) {
+            .trends-iframe {
+                height: 550px;
+            }
+            #compareGeoFrame {
+                height: 650px !important;
+            }
+        }
+
+        @media (min-width: 800px) {
+            .trends-iframe {
+                height: 600px;
+            }
+            #compareGeoFrame {
+                height: 700px !important;
+            }
+        }
+
+        /* Container responsive adjustments */
+        .comparison-container {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        #compareResults {
+            max-width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Trends Pocket</h1>
+        <div class="settings-container">
+            <i class="material-icons settings-icon" id="settingsIcon">settings</i>
+            <div class="settings-dropdown" id="settingsDropdown">
+                <!-- Language Settings -->
+                <div class="settings-item">
+                    <div class="settings-item-header">
+                        <span id="languageLabel">Language</span>
+                        <select id="languageSelect" style="width: auto; min-width: 120px;">
+                            <option value="en">English</option>
+                            <option value="fr">Français</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Google Search Popup Settings -->
+                <div class="settings-item">
+                    <div class="settings-item-header">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="googleSearchPopupCheck">
+                            <span class="checkbox-icon"></span>
+                            <span id="googleSearchPopupLabel">Google Search Popup</span>
+                        </label>
+                    </div>
+                    <div class="sub-options" id="googleSearchOptions">
+                        <div class="sub-option">
+                            <label for="googleSearchCountry" id="countryLabel">Country</label>
+                            <select id="googleSearchCountry">
+                                <option value="US">United States</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="JP">Japan</option>
+                                <option value="separator" disabled>──────────</option>
+                                <option value="AF">Afghanistan</option>
+                                <option value="ZA">South Africa</option>
+                                <option value="AL">Albania</option>
+                                <option value="DZ">Algeria</option>
+                                <option value="AD">Andorra</option>
+                                <option value="AO">Angola</option>
+                                <option value="AG">Antigua and Barbuda</option>
+                                <option value="SA">Saudi Arabia</option>
+                                <option value="AR">Argentina</option>
+                                <option value="AM">Armenia</option>
+                                <option value="AU">Australia</option>
+                                <option value="AT">Austria</option>
+                                <option value="AZ">Azerbaijan</option>
+                                <option value="BS">Bahamas</option>
+                                <option value="BH">Bahrain</option>
+                                <option value="BD">Bangladesh</option>
+                                <option value="BE">Belgium</option>
+                                <option value="BZ">Belize</option>
+                                <option value="BJ">Benin</option>
+                                <option value="BT">Bhutan</option>
+                                <option value="BY">Belarus</option>
+                                <option value="BO">Bolivia</option>
+                                <option value="BW">Botswana</option>
+                                <option value="BR">Brazil</option>
+                                <option value="BN">Brunei</option>
+                                <option value="BF">Burkina Faso</option>
+                                <option value="BI">Burundi</option>
+                                <option value="KH">Cambodia</option>
+                                <option value="CA">Canada</option>
+                                <option value="CV">Cape Verde</option>
+                                <option value="CL">Chile</option>
+                                <option value="CN">China</option>
+                                <option value="CO">Colombia</option>
+                                <option value="CR">Costa Rica</option>
+                                <option value="HR">Croatia</option>
+                                <option value="CU">Cuba</option>
+                                <option value="CD">DR Congo</option>
+                                <option value="CG">Congo</option>
+                                <option value="CF">Central African Republic</option>
+                                <option value="DK">Denmark</option>
+                                <option value="DJ">Djibouti</option>
+                                <option value="DM">Dominica</option>
+                                <option value="EG">Egypt</option>
+                                <option value="EC">Ecuador</option>
+                                <option value="ET">Ethiopia</option>
+                                <option value="ES">Spain</option>
+                                <option value="EE">Estonia</option>
+                                <option value="FJ">Fiji</option>
+                                <option value="FI">Finland</option>
+                                <option value="GA">Gabon</option>
+                                <option value="GE">Georgia</option>
+                                <option value="GH">Ghana</option>
+                                <option value="GI">Gibraltar</option>
+                                <option value="GL">Greenland</option>
+                                <option value="GT">Guatemala</option>
+                                <option value="GY">Guyana</option>
+                                <option value="HT">Haiti</option>
+                                <option value="HN">Honduras</option>
+                                <option value="HU">Hungary</option>
+                                <option value="HK">Hong Kong</option>
+                                <option value="IM">Isle of Man</option>
+                                <option value="CK">Cook Islands</option>
+                                <option value="PN">Pitcairn Islands</option>
+                                <option value="SB">Solomon Islands</option>
+                                <option value="VI">U.S. Virgin Islands</option>
+                                <option value="VG">British Virgin Islands</option>
+                                <option value="IN">India</option>
+                                <option value="ID">Indonesia</option>
+                                <option value="IQ">Iraq</option>
+                                <option value="IE">Ireland</option>
+                                <option value="IS">Iceland</option>
+                                <option value="IL">Israel</option>
+                                <option value="IT">Italy</option>
+                                <option value="JM">Jamaica</option>
+                                <option value="JO">Jordan</option>
+                                <option value="KE">Kenya</option>
+                                <option value="KG">Kyrgyzstan</option>
+                                <option value="KI">Kiribati</option>
+                                <option value="KW">Kuwait</option>
+                                <option value="KZ">Kazakhstan</option>
+                                <option value="LA">Laos</option>
+                                <option value="LS">Lesotho</option>
+                                <option value="LV">Latvia</option>
+                                <option value="LT">Lithuania</option>
+                                <option value="LU">Luxembourg</option>
+                                <option value="LB">Lebanon</option>
+                                <option value="LY">Libya</option>
+                                <option value="MG">Madagascar</option>
+                                <option value="MK">North Macedonia</option>
+                                <option value="MY">Malaysia</option>
+                                <option value="MW">Malawi</option>
+                                <option value="MT">Malta</option>
+                                <option value="MV">Maldives</option>
+                                <option value="ML">Mali</option>
+                                <option value="MX">Mexico</option>
+                                <option value="MD">Moldova</option>
+                                <option value="MN">Mongolia</option>
+                                <option value="ME">Montenegro</option>
+                                <option value="MS">Montserrat</option>
+                                <option value="MM">Myanmar</option>
+                                <option value="NA">Namibia</option>
+                                <option value="NI">Nicaragua</option>
+                                <option value="NE">Niger</option>
+                                <option value="NG">Nigeria</option>
+                                <option value="NO">Norway</option>
+                                <option value="NZ">New Zealand</option>
+                                <option value="OM">Oman</option>
+                                <option value="UG">Uganda</option>
+                                <option value="UZ">Uzbekistan</option>
+                                <option value="PK">Pakistan</option>
+                                <option value="PA">Panama</option>
+                                <option value="PY">Paraguay</option>
+                                <option value="PE">Peru</option>
+                                <option value="PH">Philippines</option>
+                                <option value="PL">Poland</option>
+                                <option value="PR">Puerto Rico</option>
+                                <option value="PT">Portugal</option>
+                                <option value="QA">Qatar</option>
+                                <option value="CZ">Czech Republic</option>
+                                <option value="RO">Romania</option>
+                                <option value="RU">Russia</option>
+                                <option value="RW">Rwanda</option>
+                                <option value="SM">San Marino</option>
+                                <option value="VC">Saint Vincent and the Grenadines</option>
+                                <option value="WS">Samoa</option>
+                                <option value="AS">American Samoa</option>
+                                <option value="ST">São Tomé and Príncipe</option>
+                                <option value="SN">Senegal</option>
+                                <option value="SC">Seychelles</option>
+                                <option value="SL">Sierra Leone</option>
+                                <option value="SG">Singapore</option>
+                                <option value="SK">Slovakia</option>
+                                <option value="SI">Slovenia</option>
+                                <option value="SO">Somalia</option>
+                                <option value="SR">Suriname</option>
+                                <option value="SE">Sweden</option>
+                                <option value="CH">Switzerland</option>
+                                <option value="TJ">Tajikistan</option>
+                                <option value="TZ">Tanzania</option>
+                                <option value="TD">Chad</option>
+                                <option value="TG">Togo</option>
+                                <option value="TL">East Timor</option>
+                                <option value="TO">Tonga</option>
+                                <option value="TT">Trinidad and Tobago</option>
+                                <option value="TM">Turkmenistan</option>
+                                <option value="TR">Turkey</option>
+                                <option value="UA">Ukraine</option>
+                                <option value="UY">Uruguay</option>
+                                <option value="VU">Vanuatu</option>
+                                <option value="VE">Venezuela</option>
+                                <option value="VN">Vietnam</option>
+                                <option value="ZM">Zambia</option>
+                                <option value="ZW">Zimbabwe</option>
+                                <option value="CAT">Catalonia</option>
+                            </select>
+                        </div>
+                        <div class="sub-option">
+                            <label for="googleSearchTimeRange" id="trendsPeriodsLabel">Trends period</label>
+                            <select id="googleSearchTimeRange">
+                                <option value="now 1-H" id="googleSearchPastHour">Past hour</option>
+                                <option value="now 4-H" id="googleSearchPast4Hours">Past 4 hours</option>
+                                <option value="now 1-d" id="googleSearchPastDay">Past day</option>
+                                <option value="now 7-d" selected id="googleSearchPast7Days">Past 7 days</option>
+                                <option value="today 1-m" id="googleSearchPast30Days">Past 30 days</option>
+                                <option value="today 3-m" id="googleSearchPast90Days">Past 90 days</option>
+                                <option value="today 12-m" id="googleSearchPast12Months">Past 12 months</option>
+                                <option value="today 5-y" id="googleSearchPast5Years">Past 5 years</option>
+                                <option value="all" id="googleSearchSince2004">Since 2004</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="main-menu">
+            <div class="main-menu-item active" id="trendsMenuItem">Trends</div>
+            <div class="main-menu-item" id="searchMenuItem">Search</div>
+        </div>
+
+        <!-- Section Trends -->
+        <div class="content-section active" id="trendsSection">
+            <div class="section-title" id="emergingTrendsTitle">Emerging Trends</div>
+            <select id="countrySelect">
+                <option value="US">United States</option>
+                <option value="GB">United Kingdom</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="JP">Japan</option>
+                <option value="separator" disabled>──────────</option>
+                <option value="AF">Afghanistan</option>
+                <option value="ZA">South Africa</option>
+                <option value="AL">Albania</option>
+                <option value="DZ">Algeria</option>
+                <option value="AD">Andorra</option>
+                <option value="AO">Angola</option>
+                <option value="AG">Antigua and Barbuda</option>
+                <option value="SA">Saudi Arabia</option>
+                <option value="AR">Argentina</option>
+                <option value="AM">Armenia</option>
+                <option value="AU">Australia</option>
+                <option value="AT">Austria</option>
+                <option value="AZ">Azerbaijan</option>
+                <option value="BS">Bahamas</option>
+                <option value="BH">Bahrain</option>
+                <option value="BD">Bangladesh</option>
+                <option value="BE">Belgium</option>
+                <option value="BZ">Belize</option>
+                <option value="BJ">Benin</option>
+                <option value="BT">Bhutan</option>
+                <option value="BY">Belarus</option>
+                <option value="BO">Bolivia</option>
+                <option value="BW">Botswana</option>
+                <option value="BR">Brazil</option>
+                <option value="BN">Brunei</option>
+                <option value="BF">Burkina Faso</option>
+                <option value="BI">Burundi</option>
+                <option value="KH">Cambodia</option>
+                <option value="CA">Canada</option>
+                <option value="CV">Cape Verde</option>
+                <option value="CL">Chile</option>
+                <option value="CN">China</option>
+                <option value="CO">Colombia</option>
+                <option value="CR">Costa Rica</option>
+                <option value="HR">Croatia</option>
+                <option value="CU">Cuba</option>
+                <option value="CD">DR Congo</option>
+                <option value="CG">Congo</option>
+                <option value="CF">Central African Republic</option>
+                <option value="DK">Denmark</option>
+                <option value="DJ">Djibouti</option>
+                <option value="DM">Dominica</option>
+                <option value="EG">Egypt</option>
+                <option value="EC">Ecuador</option>
+                <option value="ET">Ethiopia</option>
+                <option value="ES">Spain</option>
+                <option value="EE">Estonia</option>
+                <option value="FJ">Fiji</option>
+                <option value="FI">Finland</option>
+                <option value="GA">Gabon</option>
+                <option value="GE">Georgia</option>
+                <option value="GH">Ghana</option>
+                <option value="GI">Gibraltar</option>
+                <option value="GL">Greenland</option>
+                <option value="GT">Guatemala</option>
+                <option value="GY">Guyana</option>
+                <option value="HT">Haiti</option>
+                <option value="HN">Honduras</option>
+                <option value="HU">Hungary</option>
+                <option value="HK">Hong Kong</option>
+                <option value="IM">Isle of Man</option>
+                <option value="CK">Cook Islands</option>
+                <option value="PN">Pitcairn Islands</option>
+                <option value="SB">Solomon Islands</option>
+                <option value="VI">U.S. Virgin Islands</option>
+                <option value="VG">British Virgin Islands</option>
+                <option value="IN">India</option>
+                <option value="ID">Indonesia</option>
+                <option value="IQ">Iraq</option>
+                <option value="IE">Ireland</option>
+                <option value="IS">Iceland</option>
+                <option value="IL">Israel</option>
+                <option value="IT">Italy</option>
+                <option value="JM">Jamaica</option>
+                <option value="JO">Jordan</option>
+                <option value="KE">Kenya</option>
+                <option value="KG">Kyrgyzstan</option>
+                <option value="KI">Kiribati</option>
+                <option value="KW">Kuwait</option>
+                <option value="KZ">Kazakhstan</option>
+                <option value="LA">Laos</option>
+                <option value="LS">Lesotho</option>
+                <option value="LV">Latvia</option>
+                <option value="LT">Lithuania</option>
+                <option value="LU">Luxembourg</option>
+                <option value="LB">Lebanon</option>
+                <option value="LY">Libya</option>
+                <option value="MG">Madagascar</option>
+                <option value="MK">North Macedonia</option>
+                <option value="MY">Malaysia</option>
+                <option value="MW">Malawi</option>
+                <option value="MT">Malta</option>
+                <option value="MV">Maldives</option>
+                <option value="ML">Mali</option>
+                <option value="MX">Mexico</option>
+                <option value="MD">Moldova</option>
+                <option value="MN">Mongolia</option>
+                <option value="ME">Montenegro</option>
+                <option value="MS">Montserrat</option>
+                <option value="MM">Myanmar</option>
+                <option value="NA">Namibia</option>
+                <option value="NI">Nicaragua</option>
+                <option value="NE">Niger</option>
+                <option value="NG">Nigeria</option>
+                <option value="NO">Norway</option>
+                <option value="NZ">New Zealand</option>
+                <option value="OM">Oman</option>
+                <option value="UG">Uganda</option>
+                <option value="UZ">Uzbekistan</option>
+                <option value="PK">Pakistan</option>
+                <option value="PA">Panama</option>
+                <option value="PY">Paraguay</option>
+                <option value="PE">Peru</option>
+                <option value="PH">Philippines</option>
+                <option value="PL">Poland</option>
+                <option value="PR">Puerto Rico</option>
+                <option value="PT">Portugal</option>
+                <option value="QA">Qatar</option>
+                <option value="CZ">Czech Republic</option>
+                <option value="RO">Romania</option>
+                <option value="RU">Russia</option>
+                <option value="RW">Rwanda</option>
+                <option value="SM">San Marino</option>
+                <option value="VC">Saint Vincent and the Grenadines</option>
+                <option value="WS">Samoa</option>
+                <option value="AS">American Samoa</option>
+                <option value="ST">São Tomé and Príncipe</option>
+                <option value="SN">Senegal</option>
+                <option value="SC">Seychelles</option>
+                <option value="SL">Sierra Leone</option>
+                <option value="SG">Singapore</option>
+                <option value="SK">Slovakia</option>
+                <option value="SI">Slovenia</option>
+                <option value="SO">Somalia</option>
+                <option value="SR">Suriname</option>
+                <option value="SE">Sweden</option>
+                <option value="CH">Switzerland</option>
+                <option value="TJ">Tajikistan</option>
+                <option value="TZ">Tanzania</option>
+                <option value="TD">Chad</option>
+                <option value="TG">Togo</option>
+                <option value="TL">East Timor</option>
+                <option value="TO">Tonga</option>
+                <option value="TT">Trinidad and Tobago</option>
+                <option value="TM">Turkmenistan</option>
+                <option value="TR">Turkey</option>
+                <option value="UA">Ukraine</option>
+                <option value="UY">Uruguay</option>
+                <option value="VU">Vanuatu</option>
+                <option value="VE">Venezuela</option>
+                <option value="VN">Vietnam</option>
+                <option value="ZM">Zambia</option>
+                <option value="ZW">Zimbabwe</option>
+                <option value="CAT">Catalonia</option>
+            </select>
+
+            <div id="emergingTrendsList">
+                <table class="trends-table">
+                    <thead>
+                        <tr>
+                            <th id="sortTrend">Trends</th>
+                            <th id="sortVolume">Volume</th>
+                            <th id="sortStart">Started</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="trendsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section Search avec comparaison -->
+        <div class="content-section" id="searchSection">
+            <div class="section-title" id="compareTrendsTitle">Compare Trends</div>
+            
+            <div class="comparison-container">
+                <div class="keywords-list" id="keywordsList">
+                    <div class="keyword-item color-1">
+                        <input type="text" placeholder="Enter first keyword..." class="keyword-input" data-index="0" id="firstKeywordPlaceholder">
+                        <span class="remove-keyword material-icons" data-index="0">close</span>
+                    </div>
+                </div>
+                
+                <button class="add-keyword-btn" id="addKeywordBtn">
+                    <span class="material-icons" style="margin-right: 8px;">add</span>
+                    <span id="addKeywordText">Add keyword to compare (max 5)</span>
+                </button>
+
+                <div class="compare-controls">
+                    <select id="compareCountrySelect">
+                        <option value="US">United States</option>
+                        <option value="GB">United Kingdom</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="JP">Japan</option>
+                        <option value="separator" disabled>──────────</option>
+                        <option value="AF">Afghanistan</option>
+                        <option value="ZA">South Africa</option>
+                        <option value="AL">Albania</option>
+                        <option value="DZ">Algeria</option>
+                        <option value="AD">Andorra</option>
+                        <option value="AO">Angola</option>
+                        <option value="AG">Antigua and Barbuda</option>
+                        <option value="SA">Saudi Arabia</option>
+                        <option value="AR">Argentina</option>
+                        <option value="AM">Armenia</option>
+                        <option value="AU">Australia</option>
+                        <option value="AT">Austria</option>
+                        <option value="AZ">Azerbaijan</option>
+                        <option value="BS">Bahamas</option>
+                        <option value="BH">Bahrain</option>
+                        <option value="BD">Bangladesh</option>
+                        <option value="BE">Belgium</option>
+                        <option value="BZ">Belize</option>
+                        <option value="BJ">Benin</option>
+                        <option value="BT">Bhutan</option>
+                        <option value="BY">Belarus</option>
+                        <option value="BO">Bolivia</option>
+                        <option value="BW">Botswana</option>
+                        <option value="BR">Brazil</option>
+                        <option value="BN">Brunei</option>
+                        <option value="BF">Burkina Faso</option>
+                        <option value="BI">Burundi</option>
+                        <option value="KH">Cambodia</option>
+                        <option value="CA">Canada</option>
+                        <option value="CV">Cape Verde</option>
+                        <option value="CL">Chile</option>
+                        <option value="CN">China</option>
+                        <option value="CO">Colombia</option>
+                        <option value="CR">Costa Rica</option>
+                        <option value="HR">Croatia</option>
+                        <option value="CU">Cuba</option>
+                        <option value="CD">DR Congo</option>
+                        <option value="CG">Congo</option>
+                        <option value="CF">Central African Republic</option>
+                        <option value="DK">Denmark</option>
+                        <option value="DJ">Djibouti</option>
+                        <option value="DM">Dominica</option>
+                        <option value="EG">Egypt</option>
+                        <option value="EC">Ecuador</option>
+                        <option value="ET">Ethiopia</option>
+                        <option value="ES">Spain</option>
+                        <option value="EE">Estonia</option>
+                        <option value="FJ">Fiji</option>
+                        <option value="FI">Finland</option>
+                        <option value="GA">Gabon</option>
+                        <option value="GE">Georgia</option>
+                        <option value="GH">Ghana</option>
+                        <option value="GI">Gibraltar</option>
+                        <option value="GL">Greenland</option>
+                        <option value="GT">Guatemala</option>
+                        <option value="GY">Guyana</option>
+                        <option value="HT">Haiti</option>
+                        <option value="HN">Honduras</option>
+                        <option value="HU">Hungary</option>
+                        <option value="HK">Hong Kong</option>
+                        <option value="IM">Isle of Man</option>
+                        <option value="CK">Cook Islands</option>
+                        <option value="PN">Pitcairn Islands</option>
+                        <option value="SB">Solomon Islands</option>
+                        <option value="VI">U.S. Virgin Islands</option>
+                        <option value="VG">British Virgin Islands</option>
+                        <option value="IN">India</option>
+                        <option value="ID">Indonesia</option>
+                        <option value="IQ">Iraq</option>
+                        <option value="IE">Ireland</option>
+                        <option value="IS">Iceland</option>
+                        <option value="IL">Israel</option>
+                        <option value="IT">Italy</option>
+                        <option value="JM">Jamaica</option>
+                        <option value="JO">Jordan</option>
+                        <option value="KE">Kenya</option>
+                        <option value="KG">Kyrgyzstan</option>
+                        <option value="KI">Kiribati</option>
+                        <option value="KW">Kuwait</option>
+                        <option value="KZ">Kazakhstan</option>
+                        <option value="LA">Laos</option>
+                        <option value="LS">Lesotho</option>
+                        <option value="LV">Latvia</option>
+                        <option value="LT">Lithuania</option>
+                        <option value="LU">Luxembourg</option>
+                        <option value="LB">Lebanon</option>
+                        <option value="LY">Libya</option>
+                        <option value="MG">Madagascar</option>
+                        <option value="MK">North Macedonia</option>
+                        <option value="MY">Malaysia</option>
+                        <option value="MW">Malawi</option>
+                        <option value="MT">Malta</option>
+                        <option value="MV">Maldives</option>
+                        <option value="ML">Mali</option>
+                        <option value="MX">Mexico</option>
+                        <option value="MD">Moldova</option>
+                        <option value="MN">Mongolia</option>
+                        <option value="ME">Montenegro</option>
+                        <option value="MS">Montserrat</option>
+                        <option value="MM">Myanmar</option>
+                        <option value="NA">Namibia</option>
+                        <option value="NI">Nicaragua</option>
+                        <option value="NE">Niger</option>
+                        <option value="NG">Nigeria</option>
+                        <option value="NO">Norway</option>
+                        <option value="NZ">New Zealand</option>
+                        <option value="OM">Oman</option>
+                        <option value="UG">Uganda</option>
+                        <option value="UZ">Uzbekistan</option>
+                        <option value="PK">Pakistan</option>
+                        <option value="PA">Panama</option>
+                        <option value="PY">Paraguay</option>
+                        <option value="PE">Peru</option>
+                        <option value="PH">Philippines</option>
+                        <option value="PL">Poland</option>
+                        <option value="PR">Puerto Rico</option>
+                        <option value="PT">Portugal</option>
+                        <option value="QA">Qatar</option>
+                        <option value="CZ">Czech Republic</option>
+                        <option value="RO">Romania</option>
+                        <option value="RU">Russia</option>
+                        <option value="RW">Rwanda</option>
+                        <option value="SM">San Marino</option>
+                        <option value="VC">Saint Vincent and the Grenadines</option>
+                        <option value="WS">Samoa</option>
+                        <option value="AS">American Samoa</option>
+                        <option value="ST">São Tomé and Príncipe</option>
+                        <option value="SN">Senegal</option>
+                        <option value="SC">Seychelles</option>
+                        <option value="SL">Sierra Leone</option>
+                        <option value="SG">Singapore</option>
+                        <option value="SK">Slovakia</option>
+                        <option value="SI">Slovenia</option>
+                        <option value="SO">Somalia</option>
+                        <option value="SR">Suriname</option>
+                        <option value="SE">Sweden</option>
+                        <option value="CH">Switzerland</option>
+                        <option value="TJ">Tajikistan</option>
+                        <option value="TZ">Tanzania</option>
+                        <option value="TD">Chad</option>
+                        <option value="TG">Togo</option>
+                        <option value="TL">East Timor</option>
+                        <option value="TO">Tonga</option>
+                        <option value="TT">Trinidad and Tobago</option>
+                        <option value="TM">Turkmenistan</option>
+                        <option value="TR">Turkey</option>
+                        <option value="UA">Ukraine</option>
+                        <option value="UY">Uruguay</option>
+                        <option value="VU">Vanuatu</option>
+                        <option value="VE">Venezuela</option>
+                        <option value="VN">Vietnam</option>
+                        <option value="ZM">Zambia</option>
+                        <option value="ZW">Zimbabwe</option>
+                        <option value="CAT">Catalonia</option>
+                    </select>
+                    
+                    <select id="compareTimeRange">
+                        <option value="now 1-H" id="pastHourOption">Past hour</option>
+                        <option value="now 4-H" id="past4HoursOption">Past 4 hours</option>
+                        <option value="now 1-d" id="pastDayOption">Past day</option>
+                        <option value="now 7-d" id="past7DaysOption">Past 7 days</option>
+                        <option value="today 1-m" selected id="past30DaysOption">Past 30 days</option>
+                        <option value="today 3-m" id="past90DaysOption">Past 90 days</option>
+                        <option value="today 12-m" id="past12MonthsOption">Past 12 months</option>
+                        <option value="today 5-y" id="past5YearsOption">Past 5 years</option>
+                        <option value="all" id="since2004Option">Since 2004</option>
+                    </select>
+                </div>
+
+                <a href="#" id="fullCompareInfoLink" class="full-info-link" target="_blank" style="display: none;">
+                    <span id="viewFullComparisonText">View full comparison on Google Trends</span>
+                </a>
+
+                <div id="compareResults" style="display: none;">
+                    <div class="iframe-title" id="timeEvolutionTitle">Time evolution comparison</div>
+                    <iframe id="compareTimeseriesFrame" class="trends-iframe"></iframe>
+                    
+                    <div class="iframe-title" id="geoDistributionTitle">Geographic distribution</div>
+                    <iframe id="compareGeoFrame" class="trends-iframe"></iframe>
+                    
+                    <div class="iframe-title" id="relatedTopicsTitle">Related topics</div>
+                    <iframe id="compareTopicsFrame" class="trends-iframe"></iframe>
+                    
+                    <div class="iframe-title" id="relatedQueriesTitle">Related queries</div>
+                    <iframe id="compareQueriesFrame" class="trends-iframe"></iframe>
+                </div>
+
+                <div id="compareEmptyState" class="empty-state">
+                    <div class="material-icons">trending_up</div>
+                    <h3 id="compareKeywordsTitle">Compare Keywords</h3>
+                    <p id="compareKeywordsDescription">Enter keywords above to compare their search trends over time and see how they perform relative to each other.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal pour les explications de tendances -->
+    <div id="trendModal" class="trend-modal">
+        <div class="trend-modal-content">
+            <div class="trend-modal-header">
+                <h4 id="trendModalTitle"></h4>
+            </div>
+            <div class="trend-modal-body">
+                <div id="trendModalLoader" class="trend-modal-loader">
+                    <div class="loader"></div>
+                </div>
+                <div id="trendModalText"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="sidepanel.js"></script>
+</body>
+</html>
